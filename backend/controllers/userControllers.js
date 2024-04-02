@@ -198,13 +198,13 @@ exports.resetPassword = catchAsyncError(async (req, res, next) => {
 //Get User Details
 exports.getUserDetails = catchAsyncError(async (req, res, next) => {
   let user;
-  if(role===`Adm`){
+  if(req.user.role===`Adm`){
     user = await Admin.findById(req.user.id)
-  }else if(role ===`Sel`){
+  }else if(req.user.role ===`Sel`){
    user = await Seller.findById(req.user.id)
-  }else if(role===`Use`){
+  }else if(req.user.role===`Use`){
    user = await User.findById(req.user.id)
-  }else if(role=== `Age`){
+  }else if(req.user.role=== `Age`){
     user = await Agent.findById(req.user.id)
   }else{
     return next(new ErrorHandler("Something Wrong!", 404));
