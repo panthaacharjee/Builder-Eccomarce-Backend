@@ -6,22 +6,15 @@ const orderSchema = new mongoose.Schema({
       type: String,
       required: true,
     },
-    city: {
+    mail: {
       type: String,
       required: true,
     },
-    state: {
+    amount: {
       type: String,
       required: true,
     },
-    zipCode: {
-      type: Number,
-      required: true,
-    },
-    phoneNo: {
-      type: String,
-      required: true,
-    },
+    
   },
   orderItems: [
     {
@@ -50,7 +43,7 @@ const orderSchema = new mongoose.Schema({
       product: {
         type: mongoose.Schema.ObjectId,
         ref: "Product",
-        required: true,
+        
       },
     },
   ],
@@ -62,7 +55,7 @@ const orderSchema = new mongoose.Schema({
   paymentInfo: {
     status: {
       type: String,
-      required: true,
+      
     },
   },
   paidAt: {
