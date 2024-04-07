@@ -168,6 +168,7 @@ exports.registerAdmin = catchAsyncError(async (req, res, next) => {
       description: req.body.description,
       price: req.body.price,
       regularPrice: req.body.regularPrice,
+      podId:req.body.id
     };
     await Product.findByIdAndUpdate(req.params.id, productData, {
       new: true,
@@ -226,7 +227,7 @@ exports.registerAdmin = catchAsyncError(async (req, res, next) => {
   });
   
   /* =============================================================
-          Delete Product (/api/v1/delete/product/:id) (req : GET)
+          Update (/api/v1/update/order/:id) (req : Put)
      ============================================================= */
      exports.updateOrder= catchAsyncError(async (req, res, next) => {
       const order= await Order.findById(req.params.id)
