@@ -9,10 +9,11 @@ router.route("/logout").get(logout);
 router.route("/password/forgot").post(forgotPassword);
 router.route("/password/reset").put(resetPassword);
 router.route("/profile/me").get(isAuthenticatedUser, getUserDetails);
+router.route("/user/password/update").put(isAuthenticatedUser, updatePassword);
+
 // router.route("/token").get(getToken)
-// router.route("/user/password/update").put(isAuthenticatedUser, updatePassword);
-// router.route("/user/profile/update").put(isAuthenticatedUser, updateProfile)
-// router.route("/user/avatar/update").put(isAuthenticatedUser, updateAvatar)
+router.route("/user/profile/update").put(isAuthenticatedUser, authorizeRoles("user"), updateProfile)
+router.route("/user/avatar/update").put(isAuthenticatedUser, authorizeRoles("user"), updateAvatar)
 // router.route("/me/update").put(isAuthenticatedUser, updateProfile);
 // router.route("/me/update/avatar").put(isAuthenticatedUser, updateAvatar);
 // router.route("/me/update/banner").put(isAuthenticatedUser, updateBanner);

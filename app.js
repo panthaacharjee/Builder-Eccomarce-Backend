@@ -19,11 +19,13 @@ app.use(cors({origin: "*"}))
 const user = require("./backend/routes/userRoutes");
 const product = require("./backend/routes/productRoutes");
 const order = require("./backend/routes/orderRoutes")
+const admin = require("./backend/routes/adminRoutes")
 
 
 app.use("/api/v1", user);
+app.use("/api/v1", admin)
 app.use("/api/v1", product);
-app.use("/api/v1", order)
+app.use("/api/v1", order);
 
 app.use(errorMiddleware);
 

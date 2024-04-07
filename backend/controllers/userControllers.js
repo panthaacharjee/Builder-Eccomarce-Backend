@@ -1,9 +1,7 @@
 const catchAsyncError = require("../middleware/catchAsyncError");
 const ErrorHandler = require("../utils/errorhandler");
 const User = require("../models/USER/userModel");
-const Seller = require("../models/USER/sellerModel")
 const Admin = require("../models/USER/adminModel")
-const Agent = require("../models/USER/agentModel")
 const sendToken = require("../utils/jwtToken");
 const sendMail = require("../utils/sendMail");
 const cloudinary = require("cloudinary");
@@ -45,15 +43,10 @@ exports.loginUser = catchAsyncError(async (req, res, next) => {
   }
 
   var user;
-  if(role===`Use`){
+  if(role==="Use"){
    user = await User.findOne({ email }).select("+password")
-  }
-  else if(role === `Sel`){
-    user = await Seller.findOne({ email }).select("+password")
-  }else if(role ===`Adm`){
+  }else if(role ==="Adm"){
     user = await Admin.findOne({ email }).select("+password")
-  }else if(role=== `Age`){
-    user = await Agent.findOne({ email }).select("+password")
   }else{
     return next(new ErrorHandler("Invalid email and password", 401));
   }
@@ -68,6 +61,7 @@ exports.loginUser = catchAsyncError(async (req, res, next) => {
     return next(new ErrorHandler("Invalid email or password", 401));
   }
 
+  // console.log(user)
   sendToken(user, 200, res, role);
 });
 
@@ -88,12 +82,8 @@ exports.forgotPassword = catchAsyncError(async (req, res, next) => {
   var user ;
   if(req.body.role ==="Use"){
     user = await User.findOne({ email: req.body.email });
-  }else if(req.body.role ==="Sel"){
-    user = await Seller.findOne({ email: req.body.email });
   }else if(req.body.role === "Adm"){
     user = await Admin.findOne({ email: req.body.email });
-  }else if(req.body.role === "Age"){
-    user = await Agent.findOne({ email: req.body.email });
   }else{
     return next(new ErrorHandler("Something Wrong! ", 404));
   }
@@ -163,13 +153,6 @@ exports.resetPassword = catchAsyncError(async (req, res, next) => {
       resetPasswordExpire: { $gt: Date.now() },
     });
 
-    //One Function calling for checking reset authentication
-    resetFunction(user);
-  } else if (req.body.role === "Sel") {
-    const user = await Seller.findOne({
-      resetPasswordToken,
-      resetPasswordExpire: { $gt: Date.now() },
-    });
 
     //One Function calling for checking reset authentication
     resetFunction(user);
@@ -179,14 +162,7 @@ exports.resetPassword = catchAsyncError(async (req, res, next) => {
       resetPasswordExpire: { $gt: Date.now() },
     });
 
-    //One Function calling for checking reset authentication
-    resetFunction(user);
-  } else if (req.body.role === "Age") {
-    const user = await Agent.findOne({
-      resetPasswordToken,
-      resetPasswordExpire: { $gt: Date.now() },
-    });
-
+ 
     //One Function calling for checking reset authentication
     resetFunction(user);
   } else {
@@ -200,12 +176,8 @@ exports.getUserDetails = catchAsyncError(async (req, res, next) => {
   let user;
   if(req.user.role === "admin"){
     user = await Admin.findById(req.user.id)
-  }else if(req.user.role ==="seller"){
-   user = await Seller.findById(req.user.id)
   }else if(req.user.role === "user"){
    user = await User.findById(req.user.id)
-  }else if(req.user.role=== "agent"){
-    user = await Agent.findById(req.user.id)
   }else{
     return next(new ErrorHandler("Something Wrong!", 404));
   }
@@ -215,80 +187,79 @@ exports.getUserDetails = catchAsyncError(async (req, res, next) => {
   });
 });
 
-// //Update User Password
-// exports.updatePassword = catchAsyncError(async (req, res, next) => {
-//   const user = await User.findById(req.user.id)
-//     .select("+password")
-//   const isPassowrdMatched = await user.comparePassword(req.body.oldPassword);
+//Update User Password
+exports.updatePassword = catchAsyncError(async (req, res, next) => {
+  const user = await User.findById(req.user.id)
+    .select("+password")
+  const isPassowrdMatched = await user.comparePassword(req.body.oldPassword);
 
-//   if (!isPassowrdMatched) {
-//     return next(new ErrorHandler("Old password is incorrect", 400));
-//   }
-//   if (req.body.newPassword !== req.body.confirmPassword) {
-//     return next(new ErrorHandler("Password does not matched", 401));
-//   }
+  if (!isPassowrdMatched) {
+    return next(new ErrorHandler("Old password is incorrect", 400));
+  }
+  // if (req.body.newPassword !== req.body.confirmPassword) {
+  //   return next(new ErrorHandler("Password does not matched", 401));
+  // }
 
-//   user.password = req.body.newPassword;
-//   await user.save();
+  user.password = req.body.newPassword;
+  await user.save();
 
-//   sendToken(user, 200, res);
-// });
+  sendToken(user, 200, res, );
+});
 
-// //Update User Profile
-// exports.updateProfile = catchAsyncError(async (req, res, next) => {
-//   const newUserData = {
-//     name: req.body.name,
-//     email: req.body.email,
-//     contact: req.body.contact,
-//     address: req.body.address,
-//   };
+//Update User Profile
+exports.updateProfile = catchAsyncError(async (req, res, next) => {
+  const newUserData = {
+    name: req.body.name,
+    contact: req.body.contact,
+    // address: req.body.address,
+  };
 
-//   const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
-//     new: true,
-//     runValidators: true,
-//     useFindAndModify: false,
-//   });
-//   res.status(200).json({
-//     success: true,
-//     user,
-//   });
-// });
+  const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
+    new: true,
+    runValidators: true,
+    useFindAndModify: false,
+  });
+  res.status(200).json({
+    success: true,
+    user,
+  });
+});
 
-// // Update Avatar Image
-// exports.updateAvatar = catchAsyncError(async (req, res, next) => {
-//   const newUserData = {};
+// Update Avatar Image
+exports.updateAvatar = catchAsyncError(async (req, res, next) => {
+  const newUserData = {};
 
-//   if (req.body.avatar !== "") {
-//     const user = await User.findById(req.user.id);
+  if (req.body.avatar !== "") {
+    const user = await User.findById(req.user.id);
 
-//     const imageId = user.avatar.public_id;
+    const imageId = user.avatar.public_id;
 
-//     if (imageId) {
-//       await cloudinary.v2.uploader.destroy(imageId);
-//     }
+    if (imageId) {
+      await cloudinary.v2.uploader.destroy(imageId);
+    }
 
-//     const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
-//       folder: "avatars",
-//       width: 400,
-//       height:400,
-//       crop: "scale",
-//     });
+    const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
+      folder: "avatars",
+      width: 400,
+      height:400,
+      crop: "scale",
+    });
 
-//     newUserData.avatar = {
-//       public_id: myCloud.public_id,
-//       url: myCloud.secure_url,
-//     };
-//   }
-//   const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
-//     new: true,
-//     runValidators: true,
-//     useFindAndModify: false,
-//   });
-//   res.status(200).json({
-//     success: true,
-//     user,
-//   });
-// });
+    newUserData.avatar = {
+      public_id: myCloud.public_id,
+      url: myCloud.secure_url,
+    };
+  }
+  const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
+    new: true,
+    runValidators: true,
+    useFindAndModify: false,
+  });
+  res.status(200).json({
+    success: true,
+    user,
+  });
+});
 
 
 

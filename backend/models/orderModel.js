@@ -6,14 +6,21 @@ const orderSchema = new mongoose.Schema({
       type: String,
       required: true,
     },
-    mail: {
+    zipcode: {
       type: String,
       required: true,
     },
-    amount: {
+    state: {
       type: String,
-      required: true,
     },
+    city:{
+      type:String,
+      required:true
+    },
+    contact:{
+      type:String,
+      required:true,
+    }
     
   },
   orderItems: [
@@ -38,25 +45,30 @@ const orderSchema = new mongoose.Schema({
       },
       image: {
         type: String,
-        required: true,
       },
       product: {
-        type: mongoose.Schema.ObjectId,
-        ref: "Product",
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "product",
         
       },
     },
   ],
   user: {
-    type: mongoose.Schema.ObjectId,
-    ref: "User",
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "user",
     required: true,
   },
   paymentInfo: {
     status: {
       type: String,
-      
     },
+    system:{
+      type: String
+    },
+    id:{
+      type:mongoose.Schema.Types.ObjectId,
+      ref: "payment"
+    }
   },
   paidAt: {
     type: Date,
@@ -77,7 +89,6 @@ const orderSchema = new mongoose.Schema({
   orderStatus: {
     type: String,
     default: "Processing",
-    required: true,
   },
   deleveredAt: {
     type:Date,

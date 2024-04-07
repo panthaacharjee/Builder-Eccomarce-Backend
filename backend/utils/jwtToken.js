@@ -9,12 +9,12 @@ const sendToken = (user, statusCode, res, role) => {
       ),
       httpOnly: true,
     };
-    const finalToken = token +","+ role
+    const finalToken = token + "," + role
     res.status(statusCode).cookie("token", finalToken, options).json({
       success: true,
       user,
     });
-    // console.log(token);
+    // console.log(finalToken);
   } catch (error) {
     console.log(error);
   }

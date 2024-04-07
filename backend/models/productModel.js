@@ -2,6 +2,9 @@ const mongoose = require("mongoose");
 
 
 const productSchema = new mongoose.Schema({
+  podId:{
+    type:String,
+  },
   name: {
     type: String,
   },
@@ -9,6 +12,9 @@ const productSchema = new mongoose.Schema({
     type:String
   },
   price: {
+    type: Number,
+  },  
+  regularPrice: {
     type: Number,
   },
   images: [
@@ -24,19 +30,14 @@ const productSchema = new mongoose.Schema({
   category:{
     type:String,
   },
+  subcategory:{
+    type:String,
+  },
 
-  size:[
-    {
-      type:String
-    }
-  ],
-  color:[
-    {
-      type:String
-    }
-  ],
+  
   stock: {
-    type: Number
+    type: Number,
+    required:true,
   },
   reviews : [
     {
