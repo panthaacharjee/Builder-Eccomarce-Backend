@@ -91,7 +91,7 @@ exports.registerAdmin = catchAsyncError(async (req, res, next) => {
    exports.createProduct = catchAsyncError(async (req, res, next) => {
     const { name, description,regularPrice, price, category, subcategory, stock,  images, id} = req.body;
   
-
+    const urls = [];
 
     // const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
     //   folder: "avatars",
@@ -100,7 +100,18 @@ exports.registerAdmin = catchAsyncError(async (req, res, next) => {
     //   crop: "scale",
     // });
   
-    await Product.create({ name, description, regularPrice, price, category, subcategory, stock,  images, podId:id  });
+    if (images) {
+      for (var i = 0; i < images.length; i++) {
+        const result = await cloudinary.uploader.upload(images[i], {
+          folder: "product",
+        });
+        urls.push({
+          public_id: result.public_id,
+          url: result.secure_url,
+        });
+      }
+    }
+    await Product.create({ name, description, regularPrice, price, category, subcategory, stock,  images:urls, podId:id  });
   
     res.status(200).json({
       success:true,
@@ -113,7 +124,7 @@ exports.registerAdmin = catchAsyncError(async (req, res, next) => {
      ============================================================= */
      exports.getAllProduct = catchAsyncError(async (req, res, next) => {
   
-      const apifeatures = new ApiFetaures(Product.find({createdAt:-1}), req.query).search().filter();
+      const apifeatures = new ApiFetaures(Product.find(), req.query).search().filter();
       const products = await apifeatures.query;
   
       res.status(200).json({
@@ -145,9 +156,11 @@ exports.registerAdmin = catchAsyncError(async (req, res, next) => {
     } 
 
     await Product.findByIdAndDelete(req.params.id);
+    const newProducts = await Product.find()
       res.status(200).json({
         success: true,
-        message:"Successfully Product Deleted!"
+        message:"Successfully Product Deleted!",
+        products : newProducts
       });
   });
   
@@ -168,7 +181,8 @@ exports.registerAdmin = catchAsyncError(async (req, res, next) => {
       description: req.body.description,
       price: req.body.price,
       regularPrice: req.body.regularPrice,
-      podId:req.body.id
+      podId:req.body.id,
+      stock:req.body.stock
     };
     await Product.findByIdAndUpdate(req.params.id, productData, {
       new: true,
@@ -188,7 +202,7 @@ exports.registerAdmin = catchAsyncError(async (req, res, next) => {
      ============================================================= */
      exports.getAllOrder = catchAsyncError(async (req, res, next) => {
   
-      const apifeatures = new ApiFetaures(Order.find({createdAt:-1}), req.query).search().filter();
+      const apifeatures = new ApiFetaures(Order.find(), req.query).search().filter();
       const orders = await apifeatures.query;
   
       res.status(200).json({
